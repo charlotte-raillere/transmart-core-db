@@ -28,7 +28,9 @@ grails.project.dependency.resolution = {
     }
 
     plugins {
-        build ':tomcat:7.0.47'
+        build ':tomcat:7.0.50', {
+			export = false
+		}
         build ':release:3.0.1', ':rest-client-builder:2.0.1', {
             export = false
         }
@@ -37,7 +39,7 @@ grails.project.dependency.resolution = {
             export = false
         }
 
-        runtime ':hibernate:3.6.10.4'
+        runtime ':hibernate:3.6.10.7'
 
         test ":code-coverage:1.2.6", {
             export = false

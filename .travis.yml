@@ -4,7 +4,7 @@ jdk:
     - oraclejdk7
 
 env:
-    - GRAILS_VERSION=2.3.3
+    - GRAILS_VERSION=2.3.5
 
 before_install:
     - mkdir -p ~/.m2 ~/.grails
