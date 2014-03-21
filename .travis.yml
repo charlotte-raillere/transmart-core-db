@@ -4,7 +4,11 @@ jdk:
     - oraclejdk7
 
 env:
+  global:
     - GRAILS_VERSION=2.3.5
+  matrix:
+    - CLOVER=
+    - CLOVER=1
 
 before_install:
     - mkdir -p ~/.m2 ~/.grails
