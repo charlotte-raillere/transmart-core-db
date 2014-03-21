@@ -6,6 +6,7 @@ jdk:
 env:
   global:
     - GRAILS_VERSION=2.3.5
+    - secure: "bvzoPDP3zspE8Lm5Z8ALzscOn3fcMYlR66pCloe2EnIarU6gBs+ZqXYTJbzzPffEISYpHcBvspZVQ4YPoDepWLZAIG/lm2+hOThD2Ib7IuM4pdKY3RHMvN/lr3MEb19cuweD3l+DSQxTe94POTWRIlvUhkyQSNmHr/Gqjdgkzmc="
   matrix:
     - CLOVER=
     - CLOVER=1
@@ -33,6 +34,10 @@ script:
 #    - ${GRAILS_HOME}/bin/grails clean
 #    - ${GRAILS_HOME}/bin/grails upgrade --non-interactive
     - ${GRAILS_HOME}/bin/grails test-app --non-interactive --stacktrace
+    - cd -
+
+after_script:
+    - bash -c '[[ -z $CLOVER ]] || ./publish_clover'
 
 notifications:
   hipchat:
