@@ -54,8 +54,7 @@ class HighDimensionDataTypeResourceImpl implements HighDimensionDataTypeResource
 
         assays = assayQuery.retrieveAssays()
         if (assays.empty) {
-            throw new EmptySetException(
-                    'No assays satisfy the provided criteria')
+            return
         }
 
         HibernateCriteriaBuilder criteriaBuilder =
