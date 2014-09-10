@@ -17,6 +17,7 @@ class TerminalConceptVariablesDataQuery {
 
     Collection<TerminalConceptVariable> clinicalVariables
     Collection<Long> patientIds
+    Collection<Long> queryIds
 
     SessionImplementor session
 
@@ -36,27 +37,51 @@ class TerminalConceptVariablesDataQuery {
 
         // see TerminalConceptVariable constants
         // see ObservationFact
-        Query query = session.createQuery """
-                SELECT
-                    patient.id,
-                    conceptCode,
-                    valueType,
-                    textValue,
-                    numberValue
-                FROM ObservationFact fact
-                WHERE
-                    patient.id IN (:patientIds)
-                AND
-                    fact.conceptCode IN (:conceptCodes)
-                ORDER BY
-                    patient ASC,
-                    conceptCode ASC"""
+        Query query = null
+        if(queryIds){ 
+            query = session.createQuery """
+                    SELECT
+                        patient.id,
+                        conceptCode,
+                        valueType,
+                        textValue,
+                        numberValue
+                    FROM ObservationFact fact
+                    WHERE
+                        patient.id IN (
+                            select patient
+                            from QtPatientSetCollection qt
+                            where resultInstance.id in (:queryIds))
+                    AND
+                        fact.conceptCode IN (:conceptCodes)
+                    ORDER BY
+                        patient ASC,
+                        conceptCode ASC"""
+            query.setParameterList 'queryIds', queryIds
+        }else{
+            query = session.createQuery """
+                    SELECT
+                        patient.id,
+                        conceptCode,
+                        valueType,
+                        textValue,
+                        numberValue
+                    FROM ObservationFact fact
+                    WHERE
+                        patient.id IN (:patientIds)
+                    AND
+                        fact.conceptCode IN (:conceptCodes)
+                    ORDER BY
+                        patient ASC,
+                        conceptCode ASC"""
+            query.setParameterList 'patientIds', patientIds
+        }
 
-        query.cacheable = false
+        query.cacheable = true
         query.readOnly  = true
         query.fetchSize = FETCH_SIZE
 
-        query.setParameterList 'patientIds', patientIds
+       
         query.setParameterList 'conceptCodes', conceptCodes
 
         query.scroll ScrollMode.FORWARD_ONLY

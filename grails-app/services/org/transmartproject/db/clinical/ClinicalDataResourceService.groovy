@@ -28,7 +28,7 @@ class ClinicalDataResourceService implements ClinicalDataResource {
     ClinicalDataTabularResult retrieveData(List<QueryResult> queryResults,
                                            List<ClinicalVariable> variables) {
         Set<Patient> patients = queriesResourceService.getPatients(queryResults)
-        retrieveDataForPatients(patients, variables)
+        retrieveDataForQueries(patients, variables, queryResults)
     }
 
     @Override
@@ -71,6 +71,36 @@ class ClinicalDataResourceService implements ClinicalDataResource {
             throw t
         }
     }
+    
+    ClinicalDataTabularResult retrieveDataForQueries(Collection<Patient> patientCollection, List<ClinicalVariable> variables, List<QueryResult> queryResults) {
+        
+                def session = sessionFactory.openStatelessSession()
+        
+                try {
+                    def patientMap = Maps.newTreeMap()
+                    def queryMap = Maps.newTreeMap()
+        
+                    patientCollection.each { patientMap[it.id] = it }
+                    queryResults.each { queryMap[it.id] = it }
+        
+                    TerminalConceptVariablesDataQuery query =
+                            new TerminalConceptVariablesDataQuery(
+                                    session: session,
+                                    patientIds: patientMap.keySet(),
+                                    queryIds: queryMap.keySet(),
+                                    clinicalVariables: variables)
+                    query.init()
+        
+                    new ClinicalDataTabularResult(
+                            query.openResultSet(),
+                            variables,
+                            patientMap)
+                } catch (Throwable t) {
+                t.printStackTrace();
+                    session.close()
+                    throw t
+                }
+            }
 
     @Override
     TabularResult<ClinicalVariableColumn, PatientRow> retrieveData(QueryResult patientSet,
